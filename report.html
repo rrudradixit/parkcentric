@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parking Report — TRINETRA</title>
+  <meta name="description" content="Full parking session report with vehicle numbers, owner info, zone allocation, duration and charges.">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060913;
+      --surface: #0a1224;
+      --surface2: #0f1c38;
+      --border: rgba(0, 210, 255, 0.14);
+      --accent: #00D2FF;
+      --accent2: #0070F3;
+      --warn: #ffb703;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --text-dim: #718096;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #060c1c 0%, #0a1836 50%, #060c1c 100%);
+      border-bottom: 1px solid rgba(0,210,255,0.25);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(0,210,255,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header-logo {
+      height: 72px; width: 72px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid rgba(0, 210, 255, 0.4);
+      padding: 4px;
+      object-fit: contain;
+      box-shadow: 0 0 24px rgba(0,210,255,0.35);
+    }
+    .header-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+    .header-text .hin {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 2px;
+    }
+    .header-text .tagline {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+    .header-right {
+      margin-left: auto;
+      text-align: right;
+    }
+    .report-badge {
+      background: rgba(0,210,255,0.12);
+      border: 1px solid rgba(0,210,255,0.35);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 6px;
+      box-shadow: 0 0 10px rgba(0,210,255,0.15);
+    }
+    .gen-time {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* ── CONTENT WRAPPER ── */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* ── KPI CARDS ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .kpi-card.green::before  { background: var(--accent); }
+    .kpi-card.blue::before   { background: var(--accent2); }
+    .kpi-card.yellow::before { background: var(--warn); }
+    .kpi-card.red::before    { background: var(--red); }
+    .kpi-card.purple::before { background: #a78bfa; }
+    .kpi-icon {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .kpi-val {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .kpi-card.green  .kpi-val { color: var(--accent); }
+    .kpi-card.blue   .kpi-val { color: var(--accent2); }
+    .kpi-card.yellow .kpi-val { color: var(--warn); }
+    .kpi-card.red    .kpi-val { color: var(--red); }
+    .kpi-card.purple .kpi-val { color: #a78bfa; }
+    .kpi-lbl {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 14px;
+      pointer-events: none;
+    }
+    input[type="text"], select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      padding: 9px 14px 9px 36px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    select { padding-left: 14px; }
+    input[type="text"]:focus, select:focus {
+      border-color: rgba(0,209,255,0.5);
+    }
+    .btn {
+      background: linear-gradient(135deg, #0a3d62, #0d5c8a);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn.green-btn {
+      background: linear-gradient(135deg, #00D2FF, #0066FF);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+    }
+    .btn.green-btn:hover {
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.5);
+    }
+    .btn.outline-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--text);
+    }
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-row label {
+      font-size: 12px;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+    .filter-row select {
+      min-width: 130px;
+      flex: 1;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .row-count {
+      font-size: 12px;
+      color: var(--text-dim);
+      background: var(--bg);
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--surface2);
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.sort-asc::after  { content: ' ▲'; font-size: 9px; }
+    thead th.sort-desc::after { content: ' ▼'; font-size: 9px; }
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--surface2); }
+    tbody tr.hidden-row { display: none; }
+    td { padding: 12px 16px; vertical-align: middle; }
+    td:first-child { color: var(--text-dim); font-size: 11px; }
+    .plate-cell {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: var(--accent2);
+      background: rgba(0,209,255,0.06);
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .zone-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .zone-1 { background: rgba(0,255,136,0.12); color: var(--accent); }
+    .zone-2 { background: rgba(255,183,3,0.12);  color: var(--warn); }
+    .zone-3 { background: rgba(239,68,68,0.12);  color: var(--red); }
+    .owner-name { font-weight: 500; color: var(--text); }
+    .owner-sub  { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+    .duration-cell { color: var(--warn); font-weight: 500; }
+    .price-cell { color: var(--accent); font-weight: 700; }
+    .status-in  { 
+      background: rgba(0,255,136,0.1); color: var(--accent);
+      padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    }
+    .status-out {
+      background: rgba(239,68,68,0.1); color: var(--red);
+      padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    }
+    tfoot td {
+      background: var(--surface2);
+      color: var(--text);
+      font-weight: 700;
+      padding: 12px 16px;
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── PAGINATION ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .page-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: background 0.15s;
+    }
+    .page-btn:hover, .page-btn.active {
+      background: rgba(0,209,255,0.15);
+      border-color: rgba(0,209,255,0.4);
+      color: var(--accent2);
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      body { background: #fff; color: #000; }
+      .header { background: #0a3d62; }
+      .no-print { display: none !important; }
+      .table-wrap { border: 1px solid #ccc; }
+      tbody tr:hover { background: transparent; }
+      thead th { background: #0a3d62; color: #fff; }
+      tfoot td { background: #0a3d62; color: #fff; }
+      .plate-cell { color: #0a3d62; background: #e8f4f8; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .header { padding: 16px 20px; flex-wrap: wrap; }
+      .container { padding: 16px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <img src="imgtri.png" alt="TRINETRA Logo" class="header-logo">
+  <div class="header-text">
+    <h1>TRINETRA</h1>
+    <div class="hin">TRINETRA</div>
+    <div class="tagline">Smart Campus Parking Management System - Comprehensive Vehicle Report</div>
+  </div>
+  <div class="header-right no-print">
+    <div class="report-badge">● Live Report</div>
+    <div class="gen-time" id="gen-time"></div>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="container">
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card green">
+      <div class="kpi-icon">🚗</div>
+      <div class="kpi-val" id="kpi-total">—</div>
+      <div class="kpi-lbl">Total Vehicles</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-icon">⏱</div>
+      <div class="kpi-val" id="kpi-avg-dur">—</div>
+      <div class="kpi-lbl">Avg Duration (min)</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-icon">₹</div>
+      <div class="kpi-val" id="kpi-revenue">—</div>
+      <div class="kpi-lbl">Total Revenue</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-icon">🔴</div>
+      <div class="kpi-val" id="kpi-active">—</div>
+      <div class="kpi-lbl">Currently Parked</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-icon">🏆</div>
+      <div class="kpi-val" id="kpi-top-zone">—</div>
+      <div class="kpi-lbl">Busiest Zone</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar no-print">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="globalSearch" placeholder="Search by vehicle no., owner, zone, slot..." oninput="applyFilters()">
+    </div>
+    <div class="filter-row">
+      <label>Zone:</label>
+      <select id="filterZone" onchange="applyFilters()">
+        <option value="">All Zones</option>
+        <option value="Zone 1">Zone 1 (Premium)</option>
+        <option value="Zone 2">Zone 2 (Standard)</option>
+        <option value="Zone 3">Zone 3 (Economy)</option>
+      </select>
+    </div>
+    <div class="filter-row">
+      <label>Status:</label>
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">All</option>
+        <option value="in">Currently IN</option>
+        <option value="out">Exited</option>
+      </select>
+    </div>
+    <div class="filter-row">
+      <label>Sort:</label>
+      <select id="sortBy" onchange="applyFilters()">
+        <option value="time_desc">Latest First</option>
+        <option value="time_asc">Oldest First</option>
+        <option value="price_desc">Highest Charge</option>
+        <option value="dur_desc">Longest Stay</option>
+      </select>
+    </div>
+    <button class="btn green-btn" onclick="window.print()">🖨 Export / Print PDF</button>
+    <button class="btn outline-btn" onclick="resetFilters()">↺ Reset</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <h2>📋 Parking Session Records</h2>
+      <span class="row-count" id="row-count">Loading…</span>
+    </div>
+    <div class="table-scroll">
+      <table id="reportTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Vehicle No.</th>
+            <th>Owner Name</th>
+            <th>Contact</th>
+            <th>Zone</th>
+            <th>Slot</th>
+            <th>Entry Time</th>
+            <th>Exit Time</th>
+            <th>Duration (min)</th>
+            <th>Charge (₹)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="reportBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="9" id="foot-label">Total Revenue</td>
+            <td id="foot-total" colspan="2">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination no-print" id="pagination"></div>
+
+</div>
+
+<script>
+// ── DATA GENERATION ──────────────────────────────────────────
+const OWNER_FIRST = ['Rajesh','Suresh','Amit','Priya','Neha','Rahul','Vijay','Kavita','Deepak','Sunita','Harpreet','Gurpreet','Mandeep','Simran','Arjun','Pooja','Ramesh','Anita','Sandeep','Meena','Ajay','Shweta','Vinod','Rekha','Kuldeep','Parminder','Navdeep','Jasmine','Gurjeet','Balwinder'];
+const OWNER_LAST  = ['Sharma','Verma','Singh','Kumar','Gupta','Kaur','Bansal','Yadav','Mehta','Joshi','Dhaliwal','Sidhu','Bhatia','Grewal','Chauhan','Tiwari','Patel','Nair','Chopra','Gill','Sethi','Arora','Malhotra','Bhatt','Sandhu','Bhullar','Saini','Bajwa','Kamboj','Dhanda'];
+const STATES = ['HR','DL','PB','UP','CH','RJ','MH','GJ','MP','UK'];
+const ZONES  = ['Zone 1','Zone 2','Zone 3'];
+const ZONE_SLOTS = { 'Zone 1': 8, 'Zone 2': 8, 'Zone 3': 8 };
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function rc(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function rl(n){ const a='ABCDEFGHIJKLMNOPQRSTUVWXYZ'; return Array.from({length:n},()=>a[ri(0,25)]).join(''); }
+
+function genPlate() {
+  return `${rc(STATES)} ${ri(10,99)} ${rl(2)} ${ri(1000,9999)}`;
+}
+function genOwner() {
+  return rc(OWNER_FIRST) + ' ' + rc(OWNER_LAST);
+}
+function genPhone() {
+  const prefix = rc(['98','97','96','95','94','93','92','91','90','87','86','85','84','83','82','81','80','79','78','77','75','74','73','70']);
+  return prefix + String(ri(10000000,99999999));
+}
+
+// Build records
+const records = [];
+const NOW = Date.now();
+
+// Generate 80-100 historical records (last 3 days)
+const total = ri(80, 100);
+for (let i = 0; i < total; i++) {
+  const zone = rc(ZONES);
+  const slotNum = ri(1, ZONE_SLOTS[zone]);
+  const slotId = `S${slotNum}`;
+  const inTime = new Date(NOW - ri(0,3)*86400000 - ri(0,23)*3600000 - ri(0,59)*60000);
+  const duration = ri(8, 280);
+  const outTime = new Date(inTime.getTime() + duration * 60000);
+  const zoneRate = zone === 'Zone 1' ? 5 : zone === 'Zone 2' ? 3 : 1.1;
+  const price = (duration * 1.1).toFixed(2);
+
+  records.push({
+    vehicle: genPlate(),
+    owner: genOwner(),
+    phone: genPhone(),
+    zone, slot: slotId,
+    inTime, outTime,
+    duration,
+    price: parseFloat(price),
+    status: 'out'
+  });
+}
+
+// Add 4-8 "currently parked" vehicles
+const activeCount = ri(4, 8);
+for (let i = 0; i < activeCount; i++) {
+  const zone = rc(ZONES);
+  const fakeIn = new Date(NOW - ri(5, 120) * 60000);
+  const elapsed = Math.floor((NOW - fakeIn) / 60000);
+  records.push({
+    vehicle: genPlate(),
+    owner: genOwner(),
+    phone: genPhone(),
+    zone, slot: `S${ri(1, 8)}`,
+    inTime: fakeIn,
+    outTime: null,
+    duration: elapsed,
+    price: parseFloat((elapsed * 1.1).toFixed(2)),
+    status: 'in'
+  });
+}
+
+records.sort((a, b) => b.inTime - a.inTime);
+
+// ── FORMATTING HELPERS ───────────────────────────────────────
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.toLocaleString('en-IN', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: true,
+    timeZone: 'Asia/Kolkata'
+  });
+}
+function maskPhone(ph) {
+  return ph.slice(0,4) + '••••' + ph.slice(-2);
+}
+
+// ── PAGINATION STATE ─────────────────────────────────────────
+let PAGE = 1;
+const PER_PAGE = 20;
+let filteredRecords = [...records];
+
+// ── RENDER ───────────────────────────────────────────────────
+function renderTable(data, page) {
+  const tbody = document.getElementById('reportBody');
+  const start = (page - 1) * PER_PAGE;
+  const slice = data.slice(start, start + PER_PAGE);
+
+  tbody.innerHTML = slice.map((r, idx) => {
+    const rowNum = start + idx + 1;
+    const zoneCls = r.zone === 'Zone 1' ? 'zone-1' : r.zone === 'Zone 2' ? 'zone-2' : 'zone-3';
+    const statusHtml = r.status === 'in'
+      ? '<span class="status-in">▶ IN</span>'
+      : '<span class="status-out">■ OUT</span>';
+    const exitHtml = r.status === 'in'
+      ? '<span style="color:var(--accent);font-size:11px">Active</span>'
+      : fmtDate(r.outTime);
+    return `
+      <tr>
+        <td>${rowNum}</td>
+        <td><span class="plate-cell">${r.vehicle}</span></td>
+        <td>
+          <div class="owner-name">${r.owner}</div>
+          <div class="owner-sub">${maskPhone(r.phone)}</div>
+        </td>
+        <td style="font-size:12px;color:var(--text-dim)">${maskPhone(r.phone)}</td>
+        <td><span class="zone-badge ${zoneCls}">${r.zone}</span></td>
+        <td>${r.slot}</td>
+        <td style="font-size:12px">${fmtDate(r.inTime)}</td>
+        <td style="font-size:12px">${exitHtml}</td>
+        <td class="duration-cell">${r.duration} min</td>
+        <td class="price-cell">₹${r.price.toFixed(2)}</td>
+        <td>${statusHtml}</td>
+      </tr>`;
+  }).join('');
+
+  // Row count
+  document.getElementById('row-count').textContent = `${data.length} records`;
+
+  // Footer
+  const tot = data.reduce((s,r) => s + r.price, 0).toFixed(2);
+  document.getElementById('foot-label').textContent = `Total Revenue (${data.length} vehicles)`;
+  document.getElementById('foot-total').textContent = `₹${tot}`;
+
+  renderPagination(data.length, page);
+  updateKPIs(data);
+}
+
+function renderPagination(total, current) {
+  const pages = Math.ceil(total / PER_PAGE);
+  const pg = document.getElementById('pagination');
+  if (pages <= 1) { pg.innerHTML = ''; return; }
+
+  let html = `<button class="page-btn" onclick="goPage(${current - 1})" ${current===1?'disabled':''}>‹ Prev</button>`;
+  for (let p = 1; p <= pages; p++) {
+    if (p === 1 || p === pages || Math.abs(p - current) <= 2) {
+      html += `<button class="page-btn ${p===current?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    } else if (Math.abs(p - current) === 3) {
+      html += `<span style="color:var(--text-dim);padding:0 4px">…</span>`;
+    }
+  }
+  html += `<button class="page-btn" onclick="goPage(${current + 1})" ${current===pages?'disabled':''}>Next ›</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filteredRecords.length / PER_PAGE);
+  PAGE = Math.max(1, Math.min(p, pages));
+  renderTable(filteredRecords, PAGE);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateKPIs(data) {
+  document.getElementById('kpi-total').textContent = data.length;
+  const avgDur = data.length ? Math.round(data.reduce((s,r) => s+r.duration,0)/data.length) : 0;
+  document.getElementById('kpi-avg-dur').textContent = avgDur;
+  const rev = data.reduce((s,r) => s+r.price, 0).toFixed(0);
+  document.getElementById('kpi-revenue').textContent = '₹' + Number(rev).toLocaleString('en-IN');
+  const active = data.filter(r => r.status === 'in').length;
+  document.getElementById('kpi-active').textContent = active;
+
+  // Busiest zone
+  const zoneCounts = {};
+  data.forEach(r => { zoneCounts[r.zone] = (zoneCounts[r.zone]||0) + 1; });
+  const top = Object.entries(zoneCounts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpi-top-zone').textContent = top ? top[0].replace('Zone ','Z') : '—';
+}
+
+// ── FILTERS ─────────────────────────────────────────────────
+function applyFilters() {
+  const q    = document.getElementById('globalSearch').value.toLowerCase().trim();
+  const zone = document.getElementById('filterZone').value;
+  const stat = document.getElementById('filterStatus').value;
+  const sort = document.getElementById('sortBy').value;
+
+  filteredRecords = records.filter(r => {
+    const matchQ = !q || [r.vehicle, r.owner, r.phone, r.zone, r.slot].some(v => v.toLowerCase().includes(q));
+    const matchZ = !zone || r.zone === zone;
+    const matchS = !stat || r.status === stat;
+    return matchQ && matchZ && matchS;
+  });
+
+  // Sort
+  filteredRecords.sort((a,b) => {
+    if (sort === 'time_asc')   return a.inTime - b.inTime;
+    if (sort === 'price_desc') return b.price - a.price;
+    if (sort === 'dur_desc')   return b.duration - a.duration;
+    return b.inTime - a.inTime; // time_desc default
+  });
+
+  PAGE = 1;
+  renderTable(filteredRecords, PAGE);
+}
+
+function resetFilters() {
+  document.getElementById('globalSearch').value = '';
+  document.getElementById('filterZone').value   = '';
+  document.getElementById('filterStatus').value = '';
+  document.getElementById('sortBy').value       = 'time_desc';
+  filteredRecords = [...records];
+  PAGE = 1;
+  renderTable(filteredRecords, PAGE);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+document.getElementById('gen-time').textContent =
+  'Generated: ' + new Date().toLocaleString('en-IN', {timeZone:'Asia/Kolkata'});
+
+filteredRecords = [...records];
+renderTable(filteredRecords, 1);
+</script>
+</body>
+</html>

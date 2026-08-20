@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRINETRA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+<!-- Auth Guard: redirect to login if not authenticated -->
+<script>
+  if (sessionStorage.getItem('pc_auth') !== 'true') {
+    window.location.replace('login.html');
+  }
+</script>
+
+<!-- Welcome Banner — full width across the top -->
+<div id="welcome-banner" class="welcome-banner">
+  <div class="wb-left">
+    <img src="imgtri.png" alt="TRINETRA Logo" class="header-logo-img logo-bg-fix">
+    <div>
+      <div class="wb-title" style="font-size: 16px;">TRINETRA</div>
+      <div class="wb-title" style="font-size: 14px; opacity: 0.9; margin-top: 2px;">TRINETRA</div>
+      <div class="wb-sub">Smart Campus &nbsp;·&nbsp; Real-Time Parking Operations</div>
+    </div>
+  </div>
+  <div class="wb-right">
+    <span class="wb-user" id="banner-user"></span>
+    <span class="wb-live"><span class="wb-dot"></span>Live</span>
+    <img src="imgtri.png" alt="TRINETRA Logo" class="header-logo-img logo-bg-fix" style="margin-left: 20px; margin-right: 0; height: 40px;">
+  </div>
+</div>
+
+    <!-- Subtle Background Glow -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="imgtri.png" alt="TRINETRA Logo" class="main-logo-img logo-bg-fix">
+            </div>
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" data-target="sec-dashboard">
+                    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg></span> Dashboard
+                </a>
+                <a href="#analytics" class="nav-item" data-target="sec-analytics">
+                    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span> Analytics
+                </a>
+                <a href="#zones" class="nav-item" data-target="sec-zones">
+                    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></span> Zones
+                </a>
+                <a href="#pricing" class="nav-item" data-target="sec-pricing">
+                    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></span> Pricing
+                </a>
+                <a href="#settings" class="nav-item" data-target="sec-settings">
+                    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> Settings
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile-small">
+                    <div class="avatar">AD</div>
+                    <div class="user-info">
+                        <span class="name">Admin User</span>
+                        <span class="role">Facility Manager</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="topbar">
+                <div class="header-title">
+                    <h1 id="page-title">Real-Time Operations</h1>
+                    <p class="subtitle" id="current-time">Loading time...</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" title="Notifications"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></button>
+                    <button class="action-btn" onclick="exportReport()">Export Report</button>
+                    <button class="action-btn" style="background:transparent;border:1px solid rgba(239,68,68,0.4);color:#f87171;box-shadow:none;" onclick="logout()">⏏ Logout</button>
+                </div>
+            </header>
+
+            <!-- 1. DASHBOARD SECTION -->
+            <section id="sec-dashboard" class="page-section active">
+                <!-- Analytics Cards -->
+                <div class="analytics-cards">
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: rgba(0, 210, 255, 0.12); color: var(--color-primary);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+                        <div class="stat-details">
+                            <h3><i class="fas fa-layer-group" style="margin-right:8px;font-size:12px;opacity:0.6"></i>Total Capacity</h3>
+                            <div class="value counter" id="val-total">24</div>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: rgba(0, 209, 255, 0.1); color: var(--color-blue);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                        <div class="stat-details">
+                            <h3><i class="fas fa-check-circle" style="margin-right:8px;font-size:12px;opacity:0.6"></i>Available</h3>
+                            <div class="value counter text-green" id="val-available">24</div>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: rgba(255, 49, 49, 0.1); color: var(--color-red);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+                        <div class="stat-details">
+                            <h3><i class="fas fa-car" style="margin-right:8px;font-size:12px;opacity:0.6"></i>Occupied</h3>
+                            <div class="value counter text-red" id="val-occupied">0</div>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: rgba(255, 183, 3, 0.1); color: #ffb703;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></div>
+                        <div class="stat-details">
+                            <h3>Utilization %</h3>
+                            <div class="value counter" id="val-utilization">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 Column Layout for Enterprise Features -->
+                <div class="dashboard-3col">
+                    <!-- Column 1: Maps & Health -->
+                    <div class="panel-col">
+                        <!-- Map Blueprint -->
+                        <div class="card map-card">
+                            <h2>Facility Blueprint</h2>
+                            <div class="bp-map" id="bp-map">
+                                <div class="bp-gate bp-entrance">Gate IN</div>
+
+                                <div class="bp-zone bp-a" id="bp-z-1">
+                                    <div class="bp-zone-name">Zone 1</div>
+                                    <div class="bp-zone-type">Premium</div>
+                                    <div class="bp-zone-bar"><div class="bp-zone-fill" id="bpbar-1"></div></div>
+                                    <div class="bp-zone-badge" id="bpbadge-1">🟢 Low</div>
+                                </div>
+
+                                <div class="bp-zone bp-b" id="bp-z-2">
+                                    <div class="bp-zone-name">Zone 2</div>
+                                    <div class="bp-zone-type">Standard</div>
+                                    <div class="bp-zone-bar"><div class="bp-zone-fill" id="bpbar-2"></div></div>
+                                    <div class="bp-zone-badge" id="bpbadge-2">🟢 Low</div>
+                                </div>
+
+                                <div class="bp-zone bp-c" id="bp-z-3">
+                                    <div class="bp-zone-name">Zone 3</div>
+                                    <div class="bp-zone-type">Economy</div>
+                                    <div class="bp-zone-bar"><div class="bp-zone-fill" id="bpbar-3"></div></div>
+                                    <div class="bp-zone-badge" id="bpbadge-3">🟢 Low</div>
+                                </div>
+
+                                <div class="bp-gate bp-exit">Exit OUT</div>
+                                <svg id="route-svg" viewBox="0 0 300 180" preserveAspectRatio="none">
+                                    <path id="route-path-elem" class="route-path" d="" fill="none"></path>
+                                    <circle id="route-pulse" cx="-50" cy="-50" r="3" fill="#ffb703"></circle>
+                                </svg>
+                            </div>
+                        </div>
+
+
+                        <!-- System Health (Monitoring) -->
+                        <div class="card health-card">
+                            <h2>System Health Monitor</h2>
+                            <div class="health-list">
+                                <div class="h-item"><div class="h-indicator green"></div> <span class="h-text">ANPR Cameras: Online</span></div>
+                                <div class="h-item"><div class="h-indicator green"></div> <span class="h-text">Bay Sensors: 100% Active</span></div>
+                                <div class="h-item"><div class="h-indicator red" id="lat-ind"></div> <span class="h-text" id="lat-text">Network API: <span style="color:var(--color-red)">OFFLINE</span></span> 
+                                    <button class="btn-mini" onclick="initHardwareBridge()" style="margin-left:auto;">Connect</button>
+                                    <button class="btn-mini" onclick="simulateHardwareA1()" style="margin-left:4px; opacity:0.5;">Test 1-1</button>
+                                </div>
+                                <div class="h-item"><div class="h-indicator red" id="ser-ind"></div> <span class="h-text" id="ser-text">Arduino Serial: <span style="color:var(--color-red)">OFFLINE</span></span></div>
+                                <div class="h-item" style="flex-direction:column; align-items:flex-start; gap:4px; margin-top:8px;">
+                                    <span style="font-size:10px; color:var(--text-dim); text-transform:uppercase;">Live Sensor Feed</span>
+                                    <div id="sensor-feed" style="width:100%; height:60px; background:rgba(0,0,0,0.4); border-radius:4px; padding:6px; font-family:monospace; font-size:10px; color:var(--color-primary); overflow-y:auto; border:1px solid var(--border-color);">
+                                        > System Ready...
+                                    </div>
+                                </div>
+                                <div class="h-item"><div class="h-indicator green"></div> <span class="h-text">Server Latency: <span id="lat-val">22</span>ms</span></div>
+                                <div class="h-item"><div class="h-indicator green"></div> <span class="h-text">Detection Acc: 99.8%</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Grid Simulator -->
+                    <div class="panel-col col-main">
+                        <div class="card parking-grid-card h-full">
+                            <div class="card-header-flex">
+                                <h2>Live Parking Grid Simulation</h2>
+                            </div>
+                            <div class="zones-container">
+                                <div class="zone" id="zone-1">
+                                    <div class="zone-header">
+                                        <h3>Zone 1</h3>
+                                        <span class="badge premium-badge">VIP / Near Entrance</span>
+                                        <span class="traffic-badge" id="traffic-1">● Low</span>
+                                    </div>
+                                    <div class="zone-traffic-bar"><div class="zone-traffic-fill" id="tbar-1"></div></div>
+                                    <div class="slots" id="slots-1"></div>
+                                </div>
+                                <div class="zone" id="zone-2">
+                                    <div class="zone-header">
+                                        <h3>Zone 2</h3>
+                                        <span class="badge std-badge">Standard Layout</span>
+                                        <span class="traffic-badge" id="traffic-2">● Low</span>
+                                    </div>
+                                    <div class="zone-traffic-bar"><div class="zone-traffic-fill" id="tbar-2"></div></div>
+                                    <div class="slots" id="slots-2"></div>
+                                </div>
+                                <div class="zone" id="zone-3">
+                                    <div class="zone-header">
+                                        <h3>Zone 3</h3>
+                                        <span class="badge eco-badge">Economy / Exit</span>
+                                        <span class="traffic-badge" id="traffic-3">● Low</span>
+                                    </div>
+                                    <div class="zone-traffic-bar"><div class="zone-traffic-fill" id="tbar-3"></div></div>
+                                    <div class="slots" id="slots-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 3: Live Operations -->
+                    <div class="panel-col">
+                        <!-- Live Detection Panel -->
+                        <div class="card detection-card relative-container glow-box" id="det-panel">
+                            <div class="card-title-row">
+                                <h2>Live Vehicle Entry</h2>
+                                <span class="live-pulse"></span>
+                            </div>
+                            <div class="detection-display" id="det-display">
+                                <div class="plate" id="det-plate">GATE IDLE</div>
+                                <div class="det-status" id="det-status">No vehicle at gate</div>
+                                <div class="det-assigned" id="det-slot">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Routing Engine + Quick Park -->
+                        <div class="card rec-card relative-container glow-box" id="rec-panel">
+                            <div class="card-title-row">
+                                <h2>Advanced Routing</h2>
+                                <label class="qp-toggle" title="Prioritize exit-adjacent slots for fast turnaround">
+                                    <input type="checkbox" id="quick-park-toggle">
+                                    <span class="qp-btn">⚡ Quick Park Area</span>
+                                </label>
+                            </div>
+                            <div class="rec-center">
+                                <span class="rec-label">Recommended Allocation</span>
+                                <div class="rec-big" id="rec-zone">-</div>
+                                <div class="rec-stats">
+                                    <span id="rec-dist">Walking Dist: -- m</span> <br> <span id="rec-cong">Congestion: --</span>
+                                </div>
+                                <p class="rec-reason" id="rec-reason">Awaiting vehicle...</p>
+                            </div>
+                        </div>
+
+                        <!-- Smart Duration Pricing -->
+                        <div class="card pricing-card relative-container glow-box" id="pricing-panel">
+                            <div class="card-title-row pricing-title-row">
+                                <h2>Smart Duration Pricing</h2>
+                                <span class="pricing-duration-tag" id="price-duration-tag">Duration: 0 min</span>
+                            </div>
+                            <div class="pricing-simulation">
+                                <div class="pricing-row pb-8">
+                                    <span class="p-label">Multipliers Active</span>
+                                    <span class="p-value peak-badge" id="peak-indicator">1.0x (Standard)</span>
+                                </div>
+                                <div class="pricing-row">
+                                    <span class="p-label">Vehicle</span>
+                                    <span class="p-value" id="price-vehicle">-</span>
+                                </div>
+                                <div class="pricing-row">
+                                    <span class="p-label">Zone Rate</span>
+                                    <span class="p-value" id="price-zone">-</span>
+                                </div>
+                                <div class="pricing-row">
+                                    <span class="p-label">Entry Time</span>
+                                    <span class="p-value" id="price-entry">-</span>
+                                </div>
+                                <div class="pricing-row">
+                                    <span class="p-label">Duration</span>
+                                    <span class="p-value" id="price-duration">-</span>
+                                </div>
+                                <div class="total-charge mt-8">
+                                    <span class="p-label">Estimated Charge</span>
+                                    <span class="p-value text-accent" id="price-charge">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Section: Advanced Graph -->
+                <div class="card graph-card mt-24">
+                    <div class="card-header">
+                        <h2>Live Occupancy Analytics & Predictions</h2>
+                        <span class="live-indicator">● LIVE DATA</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="occupancyChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. ANALYTICS SECTION -->
+            <section id="sec-analytics" class="page-section hidden">
+                <div class="analytics-grid">
+                    <div class="card col-span-2 graph-card">
+                        <h2>Weekly Revenue Forecast</h2>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card graph-card">
+                        <h2>Zone Distribution</h2>
+                        <div class="chart-container">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-24">
+                    <h2>Traffic Heatmap (Peak Hours)</h2>
+                    <div class="heatmap-mockup">
+                        <div class="time-labels">
+                            <span>8 AM</span><span>12 PM</span><span>4 PM</span><span>8 PM</span>
+                        </div>
+                        <div class="heat-bars">
+                            <div class="bar" style="height: 30%; background:#00D2FF;"></div>
+                            <div class="bar" style="height: 50%; background:#ffb703;"></div>
+                            <div class="bar" style="height: 90%; background:#ef4444;"></div>
+                            <div class="bar" style="height: 60%; background:#f97316;"></div>
+                            <div class="bar" style="height: 80%; background:#ef4444;"></div>
+                            <div class="bar" style="height: 40%; background:#00D2FF;"></div>
+                            <div class="bar" style="height: 20%; background:#ffb703;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. ZONES SECTION -->
+            <section id="sec-zones" class="page-section hidden">
+                <div class="zones-overview">
+                    <div class="card">
+                        <h2>Detailed Zone Management</h2>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Zone ID</th>
+                                    <th>Classification</th>
+                                    <th>Capacity</th>
+                                    <th>Live Occupancy</th>
+                                    <th>Status</th>
+                                    <th>Base Rate (₹/Min)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Zone 1</strong></td>
+                                    <td>Premium (Near Entrance)</td>
+                                    <td>8 Slots</td>
+                                    <td><span id="tz-1-occ">0</span> / 8</td>
+                                    <td><span class="status-badge" id="bz-1">Active</span></td>
+                                    <td>₹5.00</td>
+                                    <td><button class="text-btn">Manage</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Zone 2</strong></td>
+                                    <td>Standard (Core Area)</td>
+                                    <td>8 Slots</td>
+                                    <td><span id="tz-2-occ">0</span> / 8</td>
+                                    <td><span class="status-badge" id="bz-2">Active</span></td>
+                                    <td>₹3.00</td>
+                                    <td><button class="text-btn">Manage</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Zone 3</strong></td>
+                                    <td>Economy (Near Exit)</td>
+                                    <td>8 Slots</td>
+                                    <td><span id="tz-3-occ">0</span> / 8</td>
+                                    <td><span class="status-badge" id="bz-3">Active</span></td>
+                                    <td>₹1.00</td>
+                                    <td><button class="text-btn">Manage</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. PRICING SECTION -->
+            <section id="sec-pricing" class="page-section hidden">
+                <div class="middle-grid">
+                    <div class="card">
+                        <h2>Pricing Rules & Modifiers</h2>
+                        <div class="form-group pb-16">
+                            <label>Base Multiplier (Standard Hours)</label>
+                            <input type="number" value="1.0" class="input-field" step="0.1">
+                        </div>
+                        <div class="form-group pb-16">
+                            <label>Automatic Peak Hour Threshold (%)</label>
+                            <input type="number" value="65" class="input-field" placeholder="Enter Util %">
+                        </div>
+                        <div class="form-group pb-16">
+                            <label>Automatic Peak Multiplier</label>
+                            <select class="input-field">
+                                <option>1.2x (Slight High)</option>
+                                <option selected>1.5x (Moderate)</option>
+                                <option>2.0x (High Demand)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Grace Period Limit (Minutes)</label>
+                            <input type="number" value="15" class="input-field">
+                        </div>
+                        <button class="action-btn mt-16 w-full">Deploy Rules</button>
+                    </div>
+
+                    <div class="card">
+                        <h2>Active Sessions Log (Live Parsing)</h2>
+                        <div class="sessions-list" id="active-sessions-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. SETTINGS SECTION -->
+            <section id="sec-settings" class="page-section hidden">
+                <div class="settings-grid grid-2">
+                    <div class="card">
+                        <h2>Hardware & Integration Configuration</h2>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h3>Automated Access Gates (ANPR)</h3>
+                                <p>Enable boom barriers to automatically open on plate tag read vs manual review.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <h3>Bay Sensor Polling</h3>
+                                <p>Fetch bay occupancy status from ground sensors every 2000ms.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row border-0">
+                            <div class="setting-info">
+                                <h3>Emergency Override (Gates Open)</h3>
+                                <p>Force open all entry and exit gateways for facility evacuation.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider round red-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Account Profile</h2>
+                        <div class="profile-form">
+                            <div class="form-group">
+                                <label>Facility Name Identifier</label>
+                                <input type="text" value="TRINETRA Hub" class="input-field">
+                            </div>
+                            <div class="form-group">
+                                <label>Administrator Email</label>
+                                <input type="email" value="admin@trinetra.ac.in" class="input-field" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Operation Timezone</label>
+                                <select class="input-field">
+                                    <option selected>Asia/Kolkata (IST)</option>
+                                    <option>UTC +00:00</option>
+                                </select>
+                            </div>
+                            <button class="action-btn mt-16 outline">Log Out Securely</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+
+</html>
